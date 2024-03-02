@@ -1,23 +1,27 @@
-package ua.edu.lntu.cw4
+package com.example.uaedulntucw4
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import com.example.uaedulntucw4.ui.theme.Uaedulntucw4Theme
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            IPZ32CR4Theme {
-                // A surface container using the 'background' color from the theme
-                Surface(color = MaterialTheme.colors.background) {
-                    MyApp()
+            Uaedulntucw4Theme {
+                Surface(
+                    modifier = Modifier.fillMaxSize(),
+                    color = MaterialTheme.colorScheme.background
+                ) {
+                    FirstScreen()
                 }
             }
         }
@@ -25,39 +29,43 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun MyApp() {
-    var selectedItem by remember { mutableStateOf<String?>(null) }
-    val items = (1..10).map { "Item $it" }
-    Column(modifier = Modifier.padding(16.dp)) {
-        Text(text = "Screen 1", style = MaterialTheme.typography.h5)
-        Spacer(modifier = Modifier.height(16.dp))
-        items.forEach { item ->
-            Text(
-                text = item,
-                modifier = Modifier.clickable {
-                    selectedItem = item
-                }
-            )
-        }
-        if (selectedItem != null) {
-            Screen2(selectedItem!!)
-        }
+fun FirstScreen() {
+    Text(
+        text = "This is the first screen",
+        modifier = Modifier.fillMaxSize()
+    ) {
+        // Navigate to the second screen when clicked
+        navigateToSecondScreen()
     }
 }
 
 @Composable
-fun Screen2(item: String) {
-    Column(modifier = Modifier.padding(16.dp)) {
-        Text(text = "Screen 2", style = MaterialTheme.typography.h5)
-        Spacer(modifier = Modifier.height(16.dp))
-        Text(text = "Item Number: $item")
+fun SecondScreen() {
+    Text(
+        text = "This is the second screen",
+        modifier = Modifier.fillMaxSize()
+    ) {
+        // Navigate back to the first screen when clicked
+        navigateBackToFirstScreen()
     }
+}
+
+@Composable
+fun navigateToSecondScreen() {
+    // Replace the content with the SecondScreen composable when navigating
+    SecondScreen()
+}
+
+@Composable
+fun navigateBackToFirstScreen() {
+    // Replace the content with the FirstScreen composable when navigating back
+    FirstScreen()
 }
 
 @Preview(showBackground = true)
 @Composable
-fun DefaultPreview() {
-    IPZ32CR4Theme {
-        MyApp()
+fun FirstScreenPreview() {
+    Uaedulntucw4Theme {
+        FirstScreen()
     }
 }
