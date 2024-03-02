@@ -37,6 +37,7 @@ fun MedicineApp() {
     var currentStep by remember { mutableStateOf(1) }
     var selectedItem by remember { mutableStateOf<Int?>(null) }
     var selectedImageDesc by remember { mutableStateOf("") }
+    var selectedImageIndex by remember { mutableStateOf<Int?>(null) }
 
     Scaffold(
         topBar = {
@@ -56,12 +57,13 @@ fun MedicineApp() {
         ) {
             when (currentStep) {
                 1 -> Screen1(
-                    onItemClick = { selectedItem = it + 1; currentStep = 2 },
+                    onItemClick = { selectedItem = it + 1; selectedImageIndex = it; currentStep = 2 },
                     onDescClick = { selectedImageDesc = it },
                     modifier = Modifier.fillMaxSize()
                 )
                 2 -> Screen2(
                     selectedImageDesc = selectedImageDesc,
+                    selectedImageIndex = selectedImageIndex,
                     onBackClick = { currentStep = 1 },
                     modifier = Modifier.fillMaxSize()
                 )
@@ -77,10 +79,10 @@ fun Screen1(
     modifier: Modifier = Modifier
 ) {
     val imageList = listOf(
-        ImageInfo(R.drawable.study, "Ліки за рецептом", "Препарати призначаються ліцензованим рецептом для конкретної особи використання і регулюється через Управління з контролю за продуктами і ліками Сполучених Штатів (FDA)."),
-        ImageInfo(R.drawable.study, "Загальні ліки", "Загальні препарати можуть бути безпечними та ефективними альтернативами своїм фірмовим аналогам і часто за зниженою вартістю."),
-        ImageInfo(R.drawable.study, "Безрецептурні ліки", "Безрецептурні (безрецептурні) ліки не вимагають рецепта."),
-        ImageInfo(R.drawable.study, "Трав'яні препарати та добавки", "Трави та добавки можуть включати в себе широкий спектр речовин, включаючи вітаміни, мінерали, ферменти, і рослинні речовини."),
+        ImageInfo(R.drawable.pills, "Ліки за рецептом", "Препарати призначаються ліцензованим рецептом для конкретної особи використання і регулюється через Управління з контролю за продуктами і ліками Сполучених Штатів (FDA)."),
+        ImageInfo(R.drawable.pills, "Загальні ліки", "Загальні препарати можуть бути безпечними та ефективними альтернативами своїм фірмовим аналогам і часто за зниженою вартістю."),
+        ImageInfo(R.drawable.pills, "Безрецептурні ліки", "Безрецептурні (безрецептурні) ліки не вимагають рецепта."),
+        ImageInfo(R.drawable.pills, "Трав'яні препарати та добавки", "Трави та добавки можуть включати в себе широкий спектр речовин, включаючи вітаміни, мінерали, ферменти, і рослинні речовини."),
     )
 
     LazyColumn(
@@ -128,12 +130,20 @@ fun Screen1(
 }
 
 @Composable
-fun Screen2(selectedImageDesc: String?, onBackClick: () -> Unit, modifier: Modifier = Modifier) {
+fun Screen2(selectedImageDesc: String?, selectedImageIndex: Int?, onBackClick: () -> Unit, modifier: Modifier = Modifier) {
+    val textToShow = when (selectedImageIndex) {
+        0 -> "Успішна покупка 1"
+        1 -> "Успішна покупка 2"
+        2 -> "Успішна покупка 3"
+        3 -> "Успішна покупка 4"
+        else -> ""
+    }
+
     Column(
         modifier = modifier.padding(16.dp)
     ) {
         Text(
-            text = "Замовлення було виконано успішно",
+            text = textToShow,
             modifier = Modifier.padding(bottom = 8.dp)
         )
         Text(
@@ -144,7 +154,7 @@ fun Screen2(selectedImageDesc: String?, onBackClick: () -> Unit, modifier: Modif
             onClick = onBackClick,
             colors = ButtonDefaults.run { buttonColors(Color.Red) }
         ) {
-            Text(text = "Back")
+            Text(text = "Назад")
         }
     }
 }
