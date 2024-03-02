@@ -12,6 +12,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -35,6 +36,7 @@ class MainActivity : ComponentActivity() {
 fun MedicineApp() {
     var currentStep by remember { mutableStateOf(1) }
     var selectedItem by remember { mutableStateOf<Int?>(null) }
+    var selectedImageDesc by remember { mutableStateOf("") }
 
     Scaffold(
         topBar = {
@@ -55,9 +57,12 @@ fun MedicineApp() {
             when (currentStep) {
                 1 -> Screen1(
                     onItemClick = { selectedItem = it + 1; currentStep = 2 },
+                    onDescClick = { selectedImageDesc = it },
+                    onMoreInfoClick = { /* Handle more info click */ },
                     modifier = Modifier.fillMaxSize()
                 )
                 2 -> Screen2(
+                    selectedImageDesc = selectedImageDesc,
                     onBackClick = { currentStep = 1 },
                     modifier = Modifier.fillMaxSize()
                 )
@@ -67,59 +72,81 @@ fun MedicineApp() {
 }
 
 @Composable
-fun Screen1(onItemClick: (Int) -> Unit, modifier: Modifier = Modifier) {
+fun Screen1(
+    onItemClick: (Int) -> Unit,
+    onDescClick: (String) -> Unit,
+    onMoreInfoClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
     val imageList = listOf(
-        R.drawable.study,
-        R.drawable.study,
-        R.drawable.study,
-        R.drawable.study,
-        R.drawable.study
+        ImageInfo(R.drawable.study, "Description for image 1", "More info for image 1"),
+        ImageInfo(R.drawable.study, "Description for image 2", "More info for image 2"),
+        ImageInfo(R.drawable.study, "Description for image 3", "More info for image 3"),
+        ImageInfo(R.drawable.study, "Description for image 4", "More info for image 4"),
+        ImageInfo(R.drawable.study, "Description for image 5", "More info for image 5")
     )
 
     LazyColumn(
         modifier = modifier
     ) {
-        items(imageList) { image ->
-            Row(
+        items(imageList) { imageInfo ->
+            Column(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(16.dp)
-                    .clickable { onItemClick(imageList.indexOf(image)) }
             ) {
-                Image(
-                    painter = painterResource(id = image),
-                    contentDescription = "Image $image",
-                    modifier = Modifier.size(50.dp)
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.clickable { onItemClick(imageList.indexOf(imageInfo)) }
+                ) {
+                    Image(
+                        painter = painterResource(id = imageInfo.imageResId),
+                        contentDescription = "Image ${imageList.indexOf(imageInfo) + 1}",
+                        modifier = Modifier.size(50.dp)
+                    )
+                    Spacer(modifier = Modifier.width(16.dp))
+                    Text("Image ${imageList.indexOf(imageInfo) + 1}")
+                }
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(
+                    text = imageInfo.description,
+                    modifier = Modifier.clickable { onDescClick(imageInfo.description) }
                 )
-                Spacer(modifier = Modifier.width(16.dp))
-                Text("Description for image $image")
+                Spacer(modifier = Modifier.height(8.dp))
+                Button(
+                    onClick = onMoreInfoClick,
+                    colors = ButtonDefaults.run { buttonColors(Color.Gray) }
+                ) {
+                    Text("More Info")
+                }
             }
         }
     }
 }
 
 @Composable
-fun Screen2(onBackClick: () -> Unit, modifier: Modifier = Modifier) {
-    Box(
-        modifier = modifier,
-        contentAlignment = Alignment.Center
+fun Screen2(selectedImageDesc: String?, onBackClick: () -> Unit, modifier: Modifier = Modifier) {
+    Column(
+        modifier = modifier.padding(16.dp)
     ) {
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = Modifier.padding(16.dp)
+        Text(
+            text = "Description for selected image",
+            modifier = Modifier.padding(bottom = 8.dp)
+        )
+        Text(
+            text = selectedImageDesc ?: "",
+            modifier = Modifier.padding(bottom = 16.dp)
+        )
+        Button(
+            onClick = onBackClick,
+            colors = ButtonDefaults.run { buttonColors(Color.Red) }
         ) {
-            Text(
-                text = "Успішна покупка",
-            )
-            Spacer(modifier = Modifier.height(16.dp))
-            Button(
-                onClick = onBackClick,
-            ) {
-                Text(text = "Back")
-            }
+            Text(text = "Back")
         }
     }
 }
+
+data class ImageInfo(val imageResId: Int, val description: String, val moreInfo: String)
 
 @Preview
 @Composable
