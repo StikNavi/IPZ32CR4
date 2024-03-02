@@ -1,14 +1,14 @@
+package ua.edu.lntu.cw4
+
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.Button
-import androidx.compose.material3.CenterAlignedTopAppBar
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -35,7 +35,8 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun MedicineApp() {
     var currentStep by remember { mutableStateOf(1) }
-    var selectedItem by remember { mutableStateOf<ImageInfo?>(null) }
+    var selectedItem by remember { mutableStateOf<Int?>(null) }
+    var selectedImageDesc by remember { mutableStateOf("") }
 
     Scaffold(
         topBar = {
@@ -55,11 +56,12 @@ fun MedicineApp() {
         ) {
             when (currentStep) {
                 1 -> Screen1(
-                    onItemClick = { selectedItem = it; currentStep = 2 },
+                    onItemClick = { selectedItem = it + 1; currentStep = 2 },
+                    onDescClick = { selectedImageDesc = it },
                     modifier = Modifier.fillMaxSize()
                 )
                 2 -> Screen2(
-                    selectedItem = selectedItem,
+                    selectedImageDesc = selectedImageDesc,
                     onBackClick = { currentStep = 1 },
                     modifier = Modifier.fillMaxSize()
                 )
@@ -70,47 +72,64 @@ fun MedicineApp() {
 
 @Composable
 fun Screen1(
-    onItemClick: (ImageInfo) -> Unit,
+    onItemClick: (Int) -> Unit,
+    onDescClick: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
     val imageList = listOf(
-        ImageInfo(R.drawable.study, "Description for image 1", "Additional info for image 1"),
-        ImageInfo(R.drawable.study, "Description for image 2", "Additional info for image 2"),
-        ImageInfo(R.drawable.study, "Description for image 3", "Additional info for image 3"),
-        ImageInfo(R.drawable.study, "Description for image 4", "Additional info for image 4"),
-        ImageInfo(R.drawable.study, "Description for image 5", "Additional info for image 5")
+        ImageInfo(R.drawable.study, "Ліки за рецептом", "Препарати призначаються ліцензованим рецептом для конкретної особи використання і регулюється через Управління з контролю за продуктами і ліками Сполучених Штатів (FDA)."),
+        ImageInfo(R.drawable.study, "Загальні ліки", "Загальні препарати можуть бути безпечними та ефективними альтернативами своїм фірмовим аналогам і часто за зниженою вартістю."),
+        ImageInfo(R.drawable.study, "Безрецептурні ліки", "Безрецептурні (безрецептурні) ліки не вимагають рецепта."),
+        ImageInfo(R.drawable.study, "Трав'яні препарати та добавки", "Трави та добавки можуть включати в себе широкий спектр речовин, включаючи вітаміни, мінерали, ферменти, і рослинні речовини."),
     )
 
     LazyColumn(
         modifier = modifier
     ) {
         items(imageList) { imageInfo ->
+            var showMoreInfo by remember { mutableStateOf(false) }
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(16.dp)
-                    .clickable { onItemClick(imageInfo) }
             ) {
                 Row(
-                    verticalAlignment = Alignment.CenterVertically
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.clickable { onItemClick(imageList.indexOf(imageInfo)) }
                 ) {
                     Image(
                         painter = painterResource(id = imageInfo.imageResId),
-                        contentDescription = "Image ${imageList.indexOf(imageInfo) + 1}",
+                        contentDescription = " ${imageList.indexOf(imageInfo)}",
                         modifier = Modifier.size(50.dp)
                     )
                     Spacer(modifier = Modifier.width(16.dp))
                     Text("Image ${imageList.indexOf(imageInfo) + 1}")
                 }
                 Spacer(modifier = Modifier.height(8.dp))
-                Text(text = imageInfo.description)
+                Text(
+                    text = imageInfo.description,
+                    modifier = Modifier.clickable { onDescClick(imageInfo.description) }
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+                if (showMoreInfo) {
+                    Text(
+                        text = imageInfo.moreInfo,
+                    )
+                } else {
+                    Button(
+                        onClick = { showMoreInfo = !showMoreInfo },
+                        colors = ButtonDefaults.run { buttonColors(Color.Gray) }
+                    ) {
+                        Text("More Info")
+                    }
+                }
             }
         }
     }
 }
 
 @Composable
-fun Screen2(selectedItem: ImageInfo?, onBackClick: () -> Unit, modifier: Modifier = Modifier) {
+fun Screen2(selectedImageDesc: String?, onBackClick: () -> Unit, modifier: Modifier = Modifier) {
     Column(
         modifier = modifier.padding(16.dp)
     ) {
@@ -119,7 +138,7 @@ fun Screen2(selectedItem: ImageInfo?, onBackClick: () -> Unit, modifier: Modifie
             modifier = Modifier.padding(bottom = 8.dp)
         )
         Text(
-            text = selectedItem?.description ?: "",
+            text = selectedImageDesc ?: "",
             modifier = Modifier.padding(bottom = 16.dp)
         )
         Button(
@@ -128,14 +147,10 @@ fun Screen2(selectedItem: ImageInfo?, onBackClick: () -> Unit, modifier: Modifie
         ) {
             Text(text = "Back")
         }
-        Spacer(modifier = Modifier.height(16.dp))
-        Text(
-            text = selectedItem?.additionalInfo ?: "",
-        )
     }
 }
 
-data class ImageInfo(val imageResId: Int, val description: String, val additionalInfo: String)
+data class ImageInfo(val imageResId: Int, val description: String, val moreInfo: String)
 
 @Preview
 @Composable
