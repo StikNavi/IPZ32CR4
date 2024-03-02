@@ -90,20 +90,22 @@ fun Screen1(onItemClick: (Int) -> Unit, modifier: Modifier = Modifier) {
     LazyColumn(
         modifier = modifier
     ) {
-        itemsIndexed(list) { index, item ->
+        items(list) { item ->
             ListItem(
-                text = { Text("Item $item") },
-                icon = {
-                    Icon(
-                        painter = painterResource(id = R.drawable.ic_launcher_foreground),
-                        contentDescription = "Settings"
-                    )
-                },
-                modifier = Modifier.clickable { onItemClick(index) }
+                modifier = Modifier
+                    .clickable { onItemClick(item) }
+                    .padding(16.dp),
+                minHeight = 48.dp,
+                paddingValues = PaddingValues(16.dp),
+                content = {
+                    Text(text = "Item $item")
+                }
             )
         }
     }
 }
+
+
 
 @Composable
 fun Screen2(selectedItemId: Int?, onBackClick: () -> Unit, modifier: Modifier = Modifier) {
