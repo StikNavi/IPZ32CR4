@@ -102,8 +102,7 @@ fun Screen1(
                         contentDescription = " ${imageList.indexOf(imageInfo)}",
                         modifier = Modifier.size(50.dp)
                     )
-                    Spacer(modifier = Modifier.width(16.dp))
-                    Text("Image ${imageList.indexOf(imageInfo) + 1}")
+
                 }
                 Spacer(modifier = Modifier.height(8.dp))
                 Text(
@@ -134,7 +133,7 @@ fun Screen2(selectedImageDesc: String?, onBackClick: () -> Unit, modifier: Modif
         modifier = modifier.padding(16.dp)
     ) {
         Text(
-            text = "Description for selected image",
+            text = "Замовлення було виконано успішно",
             modifier = Modifier.padding(bottom = 8.dp)
         )
         Text(
